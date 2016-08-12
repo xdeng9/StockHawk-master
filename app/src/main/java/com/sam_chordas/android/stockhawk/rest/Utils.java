@@ -30,6 +30,9 @@ public class Utils {
         if (count == 1){
           jsonObject = jsonObject.getJSONObject("results")
               .getJSONObject("quote");
+          //Check if the symbol is valid by checking bid value is null.
+          if(jsonObject.getString("Bid").equals("null"))
+            return null;
           batchOperations.add(buildBatchOperation(jsonObject));
         } else{
           resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
@@ -92,4 +95,5 @@ public class Utils {
     }
     return builder.build();
   }
+
 }
