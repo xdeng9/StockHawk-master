@@ -53,6 +53,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private Context mContext;
   private Cursor mCursor;
   boolean isConnected;
+    public static final String SYMBOL_KEY = "symbol_key";
 
   private TextView mEmptyView;
 
@@ -89,6 +90,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
               @Override public void onItemClick(View v, int position) {
                 //TODO:
                 // do something on item click
+                  String symbol = ((TextView)v.findViewById(R.id.stock_symbol)).getText().toString();
+                Intent intent = new Intent(mContext, StockDetailActivity.class);
+                  intent.putExtra(SYMBOL_KEY,symbol);
+                startActivity(intent);
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);
