@@ -4,7 +4,11 @@ import android.content.ContentProviderOperation;
 import android.util.Log;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +26,7 @@ public class Utils {
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
+   // Log.d("JSON String: ", JSON);
     try{
       jsonObject = new JSONObject(JSON);
       if (jsonObject != null && jsonObject.length() != 0){
@@ -96,4 +101,13 @@ public class Utils {
     return builder.build();
   }
 
+  public static String getEndDate(){
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    return format.format(new Date());
+  }
+
+  public static String getStartDate(int time){
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    return "2015-09-11";
+  }
 }
