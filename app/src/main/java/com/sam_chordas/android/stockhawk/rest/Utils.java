@@ -80,7 +80,7 @@ public class Utils {
 
   public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject){
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
-        QuoteProvider.Quotes.CONTENT_URI);
+            QuoteProvider.Quotes.CONTENT_URI);
     try {
       String change = jsonObject.getString("Change");
       builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
@@ -106,8 +106,14 @@ public class Utils {
     return format.format(new Date());
   }
 
-  public static String getStartDate(int time){
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    return "2015-09-11";
+  public static String getStartDate(){
+    String startDate = getEndDate();
+    int year = Integer.parseInt(startDate.substring(0,4)) - 1;
+    return ""+year+startDate.substring(4,startDate.length());
+  }
+
+  public static String getFriendlyDate(){
+    SimpleDateFormat format = new SimpleDateFormat("MMMM d yyyy");
+    return format.format(new Date());
   }
 }

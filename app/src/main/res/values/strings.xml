@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Stock Hawk</string>
 
     <string name="action_example">Example action</string>
@@ -17,9 +17,10 @@
     <string name="add_stock">Add stock</string>
     <string name="title_activity_stock_detail">StockDetailActivity</string>
 
+    <string name="bid_price"><xliff:g id="price">%1$s</xliff:g> USD</string>
+
     <string name="tab1_text">1M</string>
     <string name="tab2_text">3M</string>
     <string name="tab3_text">6M</string>
-    <string name="tab4_text">9M</string>
-    <string name="tab5_text">12M</string>
+    <string name="tab4_text">YTD</string>
 </resources>
