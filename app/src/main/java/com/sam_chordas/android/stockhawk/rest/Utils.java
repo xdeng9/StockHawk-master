@@ -113,16 +113,11 @@ public class Utils {
     return ""+year+startDate.substring(4,startDate.length());
   }
 
-  public static String getFriendlyDate(String time){
+  public static String getFriendlyDate(){
     String friendlyDate ="";
 
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    try{
-      Date date = format.parse(time);
-      friendlyDate = new SimpleDateFormat("MMMM d yyyy").format(date);
-    }catch (ParseException e){
-      e.printStackTrace();
-    }
+    SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
+    friendlyDate = format.format(new Date());
     return friendlyDate;
   }
 

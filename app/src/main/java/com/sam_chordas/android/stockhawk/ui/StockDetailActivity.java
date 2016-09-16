@@ -1,10 +1,10 @@
 package com.sam_chordas.android.stockhawk.ui;
 
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -27,8 +27,6 @@ import com.sam_chordas.android.stockhawk.rest.ApiClient;
 import com.sam_chordas.android.stockhawk.rest.ApiInterface;
 import com.sam_chordas.android.stockhawk.rest.Utils;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,12 +35,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StockDetailActivity extends AppCompatActivity {
+import android.app.LoaderManager;
+import android.content.Loader;
+
+public class StockDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private final static String TAG = StockDetailActivity.class.getSimpleName();
     private final static int ONE_MONTH = 0;
     private final static int THREE_MONTH = 1;
     private final static int SIX_MONTH = 2;
     private final static int ONE_YEAR = 3;
+    private final static int URL_LOADER = 0;
 
     private String mSymbol;
     private List<Quote> mQuotes;
@@ -53,7 +55,6 @@ public class StockDetailActivity extends AppCompatActivity {
     private TextView mChange;
     private TextView mChangePercent;
     private TextView mDate;
-    private Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,43 +71,22 @@ public class StockDetailActivity extends AppCompatActivity {
         mChange = (TextView) findViewById(R.id.change);
         mChangePercent = (TextView) findViewById(R.id.change_percent);
         mDate = (TextView) findViewById(R.id.date);
+        mDate.setText(Utils.getFriendlyDate());
         mDates = new ArrayList<String>();
+
+        getHistoricalData(mSymbol, Utils.getStartDate(), Utils.getEndDate());
+        getLoaderManager().initLoader(URL_LOADER, null, this);
 
         mTab.setTabGravity(TabLayout.GRAVITY_FILL);
         mTab.setTabMode(TabLayout.MODE_FIXED);
-
-        getHistoricalData(mSymbol, Utils.getStartDate(), Utils.getEndDate());
-
-        mCursor = getContentResolver().query(QuoteProvider.Quotes.withSymbol(mSymbol),
-                null,
-                QuoteColumns.ISCURRENT + "=?",
-                new String[]{"1"},
-                null);
-
-        if(mCursor.moveToFirst()){
-            mBidPrice.setText(getString(R.string.bid_price,
-                    mCursor.getString(mCursor.getColumnIndex("bid_price"))));
-            mChange.setText(mCursor.getString(mCursor.getColumnIndex("change")));
-            mChangePercent.setText(mCursor.getString(mCursor.getColumnIndex("percent_change")));
-            if (mCursor.getInt(mCursor.getColumnIndex("is_up")) == 1){
-                mChange.setTextColor(Color.GREEN);
-                mChangePercent.setTextColor(Color.GREEN);
-            } else {
-                mChange.setTextColor(Color.RED);
-                mChangePercent.setTextColor(Color.RED);
-            }
-
-        }
-
         mTab.setOnTabSelectedListener(new TabOnClickListener());
-
     }
 
-    private void getHistoricalData(String symbol, String startDate, String endDate){
-        String q="select * from yahoo.finance.historicaldata where symbol = \""+symbol+"\" and startDate=\""+
-                startDate+"\" and endDate =\""+endDate+"\"";
-        String env ="store://datatables.org/alltableswithkeys";;
-        String format="json";
+    private void getHistoricalData(String symbol, String startDate, String endDate) {
+        String q = "select * from yahoo.finance.historicaldata where symbol = \"" + symbol + "\" and startDate=\"" +
+                startDate + "\" and endDate =\"" + endDate + "\"";
+        String env = "store://datatables.org/alltableswithkeys";
+        String format = "json";
 
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<QuoteResponse> call = apiService.getHistoricalData(q, env, format);
@@ -114,17 +94,15 @@ public class StockDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
                 List<Quote> quotes = response.body().getQuery().getResults().getQuotes();
-                mDate.setText(Utils.getFriendlyDate(quotes.get(0).getDate()));
                 Collections.reverse(quotes);
                 mQuotes = quotes;
 
-                for(Quote quote : quotes){
+                for (Quote quote : quotes) {
                     mDates.add(quote.getDate());
                 }
 
                 setupGraph();
                 plotLineGraph(ONE_MONTH);
-
             }
 
             @Override
@@ -134,32 +112,64 @@ public class StockDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void plotLineGraph(int duration){
+    @Override
+    public Loader<Cursor> onCreateLoader(int loaderID, Bundle bundle) {
+        return new CursorLoader(
+                this,
+                QuoteProvider.Quotes.withSymbol(mSymbol),
+                null,
+                QuoteColumns.ISCURRENT + "=?",
+                new String[]{"1"},
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data.moveToFirst()) {
+            mBidPrice.setText(getString(R.string.bid_price,
+                    data.getString(data.getColumnIndex("bid_price"))));
+            mChange.setText(data.getString(data.getColumnIndex("change")));
+            mChangePercent.setText(data.getString(data.getColumnIndex("percent_change")));
+            if (data.getInt(data.getColumnIndex("is_up")) == 1) {
+                mChange.setTextColor(Color.GREEN);
+                mChangePercent.setTextColor(Color.GREEN);
+            } else {
+                mChange.setTextColor(Color.RED);
+                mChangePercent.setTextColor(Color.RED);
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    private void plotLineGraph(int duration) {
 
         List<Entry> entries = new ArrayList<Entry>();
         int length = mQuotes.size();
 
-        switch (duration){
+        switch (duration) {
             case (ONE_MONTH):
-                for(int i=length-length/12; i< length; i++){
-                    entries.add(new Entry(i,Float.valueOf(mQuotes.get(i).getClose())));
+                for (int i = length - length / 12; i < length; i++) {
+                    entries.add(new Entry(i, Float.valueOf(mQuotes.get(i).getClose())));
                 }
                 break;
             case (THREE_MONTH):
-                for(int i=length-length/4; i< length; i++){
-                    entries.add(new Entry(i,Float.valueOf(mQuotes.get(i).getClose())));
+                for (int i = length - length / 4; i < length; i++) {
+                    entries.add(new Entry(i, Float.valueOf(mQuotes.get(i).getClose())));
                 }
                 break;
             case (SIX_MONTH):
-                //entries.clear();
-                for(int i=length/2; i< length; i++){
-                    entries.add(new Entry(i,Float.valueOf(mQuotes.get(i).getClose())));
+                for (int i = length / 2; i < length; i++) {
+                    entries.add(new Entry(i, Float.valueOf(mQuotes.get(i).getClose())));
                 }
                 break;
-            case(ONE_YEAR):
-                int i=0;
-                for (Quote quote: mQuotes){
-                    entries.add(new Entry(i,Float.valueOf(quote.getClose())));
+            case (ONE_YEAR):
+                int i = 0;
+                for (Quote quote : mQuotes) {
+                    entries.add(new Entry(i, Float.valueOf(quote.getClose())));
                     i++;
                 }
         }
@@ -172,7 +182,7 @@ public class StockDetailActivity extends AppCompatActivity {
         mChart.invalidate();
     }
 
-    private void setupGraph(){
+    private void setupGraph() {
         mChart.setNoDataText("Loading chart..."); //Not working
         YAxis yAxis = mChart.getAxisRight();
         yAxis.setTextSize(12f);
@@ -201,12 +211,12 @@ public class StockDetailActivity extends AppCompatActivity {
         });
     }
 
-    private class TabOnClickListener implements TabLayout.OnTabSelectedListener{
+    private class TabOnClickListener implements TabLayout.OnTabSelectedListener {
 
         @Override
-        public void onTabSelected(TabLayout.Tab tab){
+        public void onTabSelected(TabLayout.Tab tab) {
 
-            switch (tab.getPosition()){
+            switch (tab.getPosition()) {
 
                 case (ONE_MONTH):
                     plotLineGraph(ONE_MONTH);
@@ -225,13 +235,11 @@ public class StockDetailActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onTabReselected(TabLayout.Tab tab){
-
+        public void onTabReselected(TabLayout.Tab tab) {
         }
 
         @Override
-        public void onTabUnselected(TabLayout.Tab tab){
-
+        public void onTabUnselected(TabLayout.Tab tab) {
         }
     }
 }
