@@ -11,10 +11,13 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.AxisValueFormatter;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
@@ -36,13 +39,14 @@ import retrofit2.Response;
 
 public class StockDetailActivity extends AppCompatActivity {
     private final static String TAG = StockDetailActivity.class.getSimpleName();
-    private final static int ONE_MONTH = 1;
-    private final static int THREE_MONTH = 3;
-    private final static int SIX_MONTH = 6;
-    private final static int ONE_YEAR = 12;
+    private final static int ONE_MONTH = 0;
+    private final static int THREE_MONTH = 1;
+    private final static int SIX_MONTH = 2;
+    private final static int ONE_YEAR = 3;
 
     private String mSymbol;
     private List<Quote> mQuotes;
+    private ArrayList<String> mDates;
     private LineChart mChart;
     private TabLayout mTab;
     private TextView mBidPrice;
@@ -66,7 +70,7 @@ public class StockDetailActivity extends AppCompatActivity {
         mChange = (TextView) findViewById(R.id.change);
         mChangePercent = (TextView) findViewById(R.id.change_percent);
         mDate = (TextView) findViewById(R.id.date);
-        mDate.setText(Utils.getFriendlyDate());
+        mDates = new ArrayList<String>();
 
         mTab.setTabGravity(TabLayout.GRAVITY_FILL);
         mTab.setTabMode(TabLayout.MODE_FIXED);
@@ -94,6 +98,8 @@ public class StockDetailActivity extends AppCompatActivity {
 
         }
 
+        mTab.setOnTabSelectedListener(new TabOnClickListener());
+
     }
 
     private void getHistoricalData(String symbol, String startDate, String endDate){
@@ -108,10 +114,17 @@ public class StockDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
                 List<Quote> quotes = response.body().getQuery().getResults().getQuotes();
+                mDate.setText(Utils.getFriendlyDate(quotes.get(0).getDate()));
                 Collections.reverse(quotes);
                 mQuotes = quotes;
+
+                for(Quote quote : quotes){
+                    mDates.add(quote.getDate());
+                }
+
                 setupGraph();
-                plotLineGraph(THREE_MONTH);
+                plotLineGraph(ONE_MONTH);
+
             }
 
             @Override
@@ -165,8 +178,60 @@ public class StockDetailActivity extends AppCompatActivity {
         yAxis.setTextSize(12f);
         yAxis.setTextColor(Color.WHITE);
         mChart.getAxisLeft().setEnabled(false);
-        mChart.getXAxis().setDrawLabels(false);
+        XAxis xAxis = mChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextSize(12f);
+        xAxis.setTextColor(Color.WHITE);
+        xAxis.setDrawAxisLine(true);
+        xAxis.setDrawGridLines(false);
+        xAxis.setLabelCount(5, true);
         mChart.setDescription("");
+        mChart.getLegend().setEnabled(false);
+        mChart.setExtraOffsets(28, 0, 6, 6);
+        xAxis.setValueFormatter(new AxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return Utils.getFriendlyLabel(mDates.get((int) value));
+            }
+
+            @Override
+            public int getDecimalDigits() {
+                return 0;
+            }
+        });
     }
 
+    private class TabOnClickListener implements TabLayout.OnTabSelectedListener{
+
+        @Override
+        public void onTabSelected(TabLayout.Tab tab){
+
+            switch (tab.getPosition()){
+
+                case (ONE_MONTH):
+                    plotLineGraph(ONE_MONTH);
+                    break;
+                case (THREE_MONTH):
+                    plotLineGraph(THREE_MONTH);
+                    break;
+                case (SIX_MONTH):
+                    plotLineGraph(SIX_MONTH);
+                    break;
+                case (ONE_YEAR):
+                    plotLineGraph(ONE_YEAR);
+                    break;
+            }
+            tab.select();
+        }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab){
+
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab){
+
+        }
+    }
 }

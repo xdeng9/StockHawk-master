@@ -5,6 +5,7 @@ import android.util.Log;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,7 +27,7 @@ public class Utils {
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
-   // Log.d("JSON String: ", JSON);
+   Log.d("JSON String: ", JSON);
     try{
       jsonObject = new JSONObject(JSON);
       if (jsonObject != null && jsonObject.length() != 0){
@@ -42,7 +43,7 @@ public class Utils {
         } else{
           resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
 
-          if (resultsArray != null && resultsArray.length() != 0){
+          if (resultsArray != null && resultsArray.length() != 0 ) {
             for (int i = 0; i < resultsArray.length(); i++){
               jsonObject = resultsArray.getJSONObject(i);
               batchOperations.add(buildBatchOperation(jsonObject));
@@ -112,8 +113,29 @@ public class Utils {
     return ""+year+startDate.substring(4,startDate.length());
   }
 
-  public static String getFriendlyDate(){
-    SimpleDateFormat format = new SimpleDateFormat("MMMM d yyyy");
-    return format.format(new Date());
+  public static String getFriendlyDate(String time){
+    String friendlyDate ="";
+
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    try{
+      Date date = format.parse(time);
+      friendlyDate = new SimpleDateFormat("MMMM d yyyy").format(date);
+    }catch (ParseException e){
+      e.printStackTrace();
+    }
+    return friendlyDate;
+  }
+
+  public static String getFriendlyLabel(String label){
+    String friendlyLabel ="";
+
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    try{
+      Date date = format.parse(label);
+      friendlyLabel = new SimpleDateFormat("M/dd/yy").format(date);
+    }catch (ParseException e){
+      e.printStackTrace();
+    }
+    return friendlyLabel;
   }
 }
