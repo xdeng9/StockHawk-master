@@ -183,7 +183,7 @@ public class StockDetailActivity extends AppCompatActivity implements LoaderMana
     }
 
     private void setupGraph() {
-        mChart.setNoDataText("Loading chart..."); //Not working
+        mChart.setNoDataText("Loading chart...");
         YAxis yAxis = mChart.getAxisRight();
         yAxis.setTextSize(12f);
         yAxis.setTextColor(Color.WHITE);
