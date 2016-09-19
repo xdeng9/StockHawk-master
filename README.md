@@ -10,6 +10,11 @@
 - RTL support
 - Add Stock Hawk widget to your home screen
 
+## Libraries used:
+- Retrofit
+- MPAndroidChart
+
 ##Credit:
 - Created with the help of Udacity course: Advanced Android Development
 - Starter code provided by Udacity
+
