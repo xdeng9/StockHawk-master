@@ -10,6 +10,7 @@
     <string name="input_hint">FB</string>
     <string name="input_prefill"></string>
     <string name="network_toast">Uh-oh! This app requires an internet connection</string>
+    <string name="already_added_stock_toast">This stock is already saved!</string>
 
     <string name="empty_view_message">No stock data is available. Please check your internet connection.</string>
     <string name="invalid_symbol_toast">Invalid stock symbol!</string>
@@ -24,10 +25,17 @@
     <string name="tab3_text">6M</string>
     <string name="tab4_text">YTD</string>
 
+    <string name="percent_change_label">Change (%)</string>
+    <string name="change_label">Change</string>
+
     <!-- Content Description -->
     <string name="add_stock">Add stock</string>
     <string name="bid_price_description">Bid price</string>
     <string name="change_description">Change</string>
     <string name="change_percent_description">Percentage change</string>
     <string name="date_description">Date</string>
+    <string name="one_month">One month</string>
+    <string name="three_month">Three month</string>
+    <string name="six_month">Six month</string>
+    <string name="one_year">One year</string>
 </resources>
