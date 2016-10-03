@@ -38,6 +38,9 @@ import retrofit2.Response;
 import android.app.LoaderManager;
 import android.content.Loader;
 
+/*
+* Displays stock's historical performance in line graph
+*/
 public class StockDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private final static String TAG = StockDetailActivity.class.getSimpleName();
     private final static int ONE_MONTH = 0;
@@ -82,6 +85,7 @@ public class StockDetailActivity extends AppCompatActivity implements LoaderMana
         mTab.setOnTabSelectedListener(new TabOnClickListener());
     }
 
+    //Fetch historical data using Retrofit library
     private void getHistoricalData(String symbol, String startDate, String endDate) {
         String q = "select * from yahoo.finance.historicaldata where symbol = \"" + symbol + "\" and startDate=\"" +
                 startDate + "\" and endDate =\"" + endDate + "\"";
@@ -182,6 +186,7 @@ public class StockDetailActivity extends AppCompatActivity implements LoaderMana
         mChart.invalidate();
     }
 
+    //Set up line chart
     private void setupGraph() {
         YAxis yAxis = mChart.getAxisRight();
         yAxis.setTextSize(12f);
