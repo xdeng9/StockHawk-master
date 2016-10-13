@@ -50,6 +50,7 @@ public class StockIntentService extends IntentService {
         }
     }
 
+    // If symbol is invalid, display a toast back to main UI
     private void displayToast(){
         mHandler.post(new Runnable() {
             @Override
