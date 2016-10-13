@@ -14,7 +14,7 @@ import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 import com.sam_chordas.android.stockhawk.ui.StockDetailActivity;
 
 /**
- * Created by administrator on 9/16/16.
+ * This class is responsiable for updating the stock hawk wiget.
  */
 public class StockWidgetProvider extends AppWidgetProvider {
 
