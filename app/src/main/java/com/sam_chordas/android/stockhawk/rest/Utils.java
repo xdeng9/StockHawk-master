@@ -102,11 +102,13 @@ public class Utils {
     return builder.build();
   }
 
+  //Get today's date
   public static String getEndDate(){
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     return format.format(new Date());
   }
 
+  //Get the date from a year ago 
   public static String getStartDate(){
     String startDate = getEndDate();
     int year = Integer.parseInt(startDate.substring(0,4)) - 1;
