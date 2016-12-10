@@ -8,7 +8,7 @@
 - Add multiple stocks to watchlist
 - Keep track of stocks' historical performance
 - RTL support
-- Add Stock Hawk widget to your home screen
+- Stock Hawk widget
 
 ## Libraries used:
 - Retrofit
