@@ -1,4 +1,4 @@
-#Stock Hawk
+# Stock Hawk
 
 Project 3 for Udacity Android Developer Nanodegree
 
@@ -16,7 +16,7 @@ Project 3 for Udacity Android Developer Nanodegree
 - Retrofit
 - MPAndroidChart
 
-##Credit:
+## Credit:
 - Created with the help of Udacity course: Advanced Android Development
 - Starter code provided by Udacity
 
