@@ -11,8 +11,8 @@ Project 3 for Udacity Android Developer Nanodegree
 - Stock Hawk widget
 
 ## Libraries used:
-- Retrofit
-- MPAndroidChart
+- Retrofit (http://square.github.io/retrofit/)
+- MPAndroidChart (https://github.com/PhilJay/MPAndroidChart)
 
 ## Credit:
 - Created with the help of Udacity course: Advanced Android Development
