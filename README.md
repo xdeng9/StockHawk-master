@@ -10,7 +10,7 @@ An Android app that lets users track stock prices in real-time.
 - Stock Hawk widget
 
 
-## Fetching historical stock prices using Retrofit library
+## Fetching historical stock prices
 ``` Java
 private void getHistoricalData(String symbol, String startDate, String endDate) {
         String q = "select * from yahoo.finance.historicaldata where symbol = \"" + symbol + "\" and startDate=\"" +
